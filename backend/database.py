@@ -5,24 +5,34 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def create_connection():
+def create_connection(create_db=False):
     try:
         connection = mysql.connector.connect(
             host=os.getenv("DB_HOST"),
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME")
+            database=os.getenv("DB_NAME") if not create_db else None
         )
         return connection
     except Error as e:
-        print(f"Error connection to mysql. {e}")
+        print(f"Error connecting to MySQL: {e}")
         return None
     
 def initialize_database():
-    connection = create_connection()
+    # First, try to connect without specifying a database to check if it exists
+    connection = create_connection(create_db=True)
     if connection:
         try:
             cursor = connection.cursor()
+            
+            # Check if database exists, if not create it
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {os.getenv('DB_NAME')}")
+            print(f"Database '{os.getenv('DB_NAME')}' created or already exists")
+            
+            connection.commit()
+            
+            # Now connect to the specific database
+            connection.database = os.getenv("DB_NAME")
             
             # create a table if it does not already exist.
             # we will have a table for chat sessions
@@ -46,8 +56,13 @@ def initialize_database():
             """)
             
             connection.commit()
-            print("Database table initialised successfully")
+            print("Database tables initialized successfully")
         except Error as e:
             print(f"Error initializing database: {e}")
         finally:
-            connection.close()
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
+                
+# Initialize the database when this module is imported
+initialize_database()
