@@ -30,11 +30,16 @@ export default function Home() {
   const [chatHistory, setChatHistory] = useState<ChatSection[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
 
+  // Create a reusable API client instance
+  const apiClient = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  });
+
   // Fetch chat history on component mount
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/chat-history");
+        const response = await apiClient.get("/chat-history");
         setChatHistory(response.data);
       } catch (error) {
         console.error("Error fetching chat history:", error);
@@ -64,11 +69,11 @@ export default function Home() {
         requestData.session_id = currentSessionId;
       }
 
-      const response = await axios.post("http://localhost:8000/ask", requestData);
+      const response = await apiClient.post("/ask", requestData);
       setAnswer(response.data.answer);
       setCurrentSessionId(response.data.session_id);
       // Refresh the chat history
-      const historyResponse = await axios.get("http://localhost:8000/chat-history");
+      const historyResponse = await apiClient.get("/chat-history");
       setChatHistory(historyResponse.data);
     } catch (error) {
       setAnswer("Error: Could not get response. Please try again.");
