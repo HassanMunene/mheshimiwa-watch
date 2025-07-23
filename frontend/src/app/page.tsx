@@ -1,11 +1,22 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   Sun, Moon, ShieldAlert, ChevronRight, Menu,
-  X, Plus, Send, Smartphone, User, ChevronLeft
+  X, Send, User, History, ChevronLeft
 } from 'lucide-react';
 import Image from 'next/image';
+
+interface ChatItem {
+  question: string;
+  timestamp: string;
+  session_id: number;
+}
+
+interface ChatSection {
+  date: string;
+  chats: ChatItem[];
+}
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -16,6 +27,21 @@ export default function Home() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [savedQueries, setSavedQueries] = useState<string[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatSection[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
+
+  // Fetch chat history on component mount
+  useEffect(() => {
+    const fetchChatHistory = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/chat-history");
+        setChatHistory(response.data);
+      } catch (error) {
+        console.error("Error fetching chat history:", error);
+      }
+    };
+    fetchChatHistory();
+  }, []);
 
   // Our theme colors for our Mheshimiwa Chat Bot
   const themeColors = {
@@ -28,46 +54,50 @@ export default function Home() {
     lightCard: '#ffffff'
   };
 
-  // Sample data
-  const chatHistory = [
-    {
-      date: "2025-06",
-      chats: [
-        "Governor Sakaja's road projects status",
-        "MP attendance records 2024",
-        "Nairobi County budget allocation",
-        "Mombasa port expansion progress"
-      ]
-    },
-    {
-      date: "2025-05",
-      chats: [
-        "Kiambu County healthcare projects",
-        "Kisumu water supply updates",
-        "NG-CDF utilization in Kibera"
-      ]
-    }
-  ];
-
   const askAI = async () => {
     if (!query.trim()) return;
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:8000/ask", {
-        question: query
-      });
-      setAnswer(response.data.answer);
-      // Add to saved queries if not already there
-      if (!savedQueries.includes(query)) {
-        setSavedQueries(prev => [query, ...prev]);
+      const requestData: { question: string; session_id?: number } = { question: query };
+      if (currentSessionId !== null) {
+        requestData.session_id = currentSessionId;
       }
+
+      const response = await axios.post("http://localhost:8000/ask", requestData);
+      setAnswer(response.data.answer);
+      setCurrentSessionId(response.data.session_id);
+      // Refresh the chat history
+      const historyResponse = await axios.get("http://localhost:8000/chat-history");
+      setChatHistory(historyResponse.data);
     } catch (error) {
       setAnswer("Error: Could not get response. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  // Quick actions for sidebar
+  const quickActions = [
+    {
+      icon: <ShieldAlert size={16} />,
+      label: "Report Issue",
+      action: () => {
+        setQuery("How to report government misconduct or corruption");
+        setActiveTab('home');
+      }
+    },
+    {
+      icon: <History size={16} />,
+      label: "Recent Inquiries",
+      action: () => {
+        setActiveTab('home');
+        setQuery("");
+        setAnswer("");
+        setCurrentSessionId(null);
+      }
+    },
+  ];
 
   return (
     <div className={`flex h-screen overflow-hidden ${darkMode ? 'bg-[#1a1a1a]' : 'bg-[#f5f5f5]'} text-${darkMode ? 'white' : 'gray-800'}`}>
@@ -80,13 +110,7 @@ export default function Home() {
         <div className={`p-4 flex items-center justify-between border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} ${sidebarCollapsed ? 'flex-col gap-2' : ''}`}>
           {!sidebarCollapsed && (
             <div className="flex items-center gap-2">
-              <Image
-                src="/assets/mhesh-logo.png"
-                alt="Mhesh-Watch logo"
-                width={24}
-                height={24}
-                className="object-contain"
-              />
+              <Image src="/assets/mhesh-logo.png" alt="Mhesh-Watch logo" width={24} height={24} className="object-contain" />
               <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
                 Mhesh-Watch
               </h2>
@@ -94,13 +118,7 @@ export default function Home() {
           )}
 
           {sidebarCollapsed && (
-            <Image
-              src="/assets/mhesh-logo.png"
-              alt="Mhesh-Watch logo"
-              width={24}
-              height={24}
-              className="object-contain"
-            />
+            <Image src="/assets/mhesh-logo.png" alt="Mhesh-Watch logo" width={24} height={24} className="object-contain" />
           )}
 
           <div className="flex items-center gap-2">
@@ -125,19 +143,18 @@ export default function Home() {
 
         {/* Sidebar Content */}
         <div className="flex flex-col h-[calc(100%-60px)]">
-          {/* New Chat Button */}
-          <div className="p-4">
-            <button
-              onClick={() => {
-                setQuery("");
-                setAnswer("");
-                setActiveTab('home');
-              }}
-              className={`w-full ${sidebarCollapsed ? 'p-2' : 'p-3'} rounded-lg flex items-center justify-center gap-2 ${darkMode ? 'bg-[#046A38] hover:bg-[#03582d]' : 'bg-[#046A38] hover:bg-[#03582d]'} text-white`}
-            >
-              <Plus size={16} />
-              {!sidebarCollapsed && <span>New Query</span>}
-            </button>
+          {/* Quick Actions */}
+          <div className="p-4 space-y-2">
+            {quickActions.map((action, index) => (
+              <button
+                key={index}
+                onClick={action.action}
+                className={`w-full ${sidebarCollapsed ? 'p-2' : 'p-3'} rounded-lg flex items-center justify-center gap-2 ${darkMode ? 'bg-[#046A38] hover:bg-[#03582d]' : 'bg-[#046A38] hover:bg-[#03582d]'} text-white`}
+              >
+                {action.icon}
+                {!sidebarCollapsed && <span>{action.label}</span>}
+              </button>
+            ))}
           </div>
 
           {/* Scrollable Content */}
@@ -145,7 +162,6 @@ export default function Home() {
             {!sidebarCollapsed && (
               <h3 className="text-sm text-gray-400 mb-3 font-medium">Recent Queries</h3>
             )}
-
             {chatHistory.map((section) => (
               <div key={section.date} className="mb-6">
                 {!sidebarCollapsed && (
@@ -156,7 +172,8 @@ export default function Home() {
                     <button
                       key={index}
                       onClick={() => {
-                        setQuery(chat);
+                        setQuery(chat.question);
+                        setCurrentSessionId(chat.session_id);
                         setActiveTab('home');
                       }}
                       className={`w-full text-left text-sm ${darkMode ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'} rounded px-3 py-2 cursor-pointer truncate transition-colors flex items-center gap-2`}
@@ -164,7 +181,7 @@ export default function Home() {
                       {sidebarCollapsed ? (
                         <span className="w-2 h-2 rounded-full bg-gray-500"></span>
                       ) : (
-                        chat
+                        chat.question
                       )}
                     </button>
                   ))}
@@ -175,18 +192,6 @@ export default function Home() {
 
           {/* Bottom Section */}
           <div className="p-4 space-y-3 border-t border-gray-700">
-            <button
-              className={`w-full ${sidebarCollapsed ? 'p-2 justify-center' : 'p-3 justify-between'} rounded-lg flex items-center ${darkMode ? 'bg-transparent border-gray-600 text-white hover:bg-gray-700' : 'bg-transparent border-gray-300 text-gray-700 hover:bg-gray-100'} border`}
-            >
-              <div className="flex items-center gap-2">
-                <Smartphone size={16} />
-                {!sidebarCollapsed && <span>Get App</span>}
-              </div>
-              {!sidebarCollapsed && (
-                <span className={`bg-[#046A38] text-xs px-1.5 py-0.5 rounded text-white`}>NEW</span>
-              )}
-            </button>
-
             <div className={`flex items-center ${sidebarCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} hover:bg-gray-700 rounded-lg cursor-pointer transition-colors`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
                 <User size={16} className={darkMode ? 'text-white' : 'text-gray-700'} />
