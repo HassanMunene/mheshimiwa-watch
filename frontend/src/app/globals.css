@@ -24,3 +24,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Add Kenyan flag colors */
+.bg-kenya-green { background-color: #046A38; }
+.bg-kenya-red { background-color: #CE1126; }
