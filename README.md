@@ -1,16 +1,35 @@
-# Mheshimiwa Watch 🇰🇪  
+# Mheshimiwa Watch: Political Accountability Tracker 🇰🇪  
 **AI-Powered Political Accountability Tracker for Kenya**  
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://your-vercel-link.vercel.app)  
-[![Powered by DeepSeek-R1](https://img.shields.io/badge/Powered%20by-DeepSeek--R1-6e48aa?logo=openai)](https://openrouter.ai/models/deepseek/deepseek-r1:free)  
+[![Powered by DeepSeek-R1](https://img.shields.io/badge/Powered%20by-DeepSeek--R1-6e48aa?logo=openai)](https://openrouter.ai/models/deepseek/deepseek-r1:free)
 
-## 🌟 Why This Project?  
-Kenya’s political landscape suffers from **broken promises** and **limited transparency**. This tool empowers citizens by:  
-- Tracking manifesto pledges against actual delivery  
+## Why This Project?
+Kenya’s political landscape suffers from **broken promises** and **limited transparency**. This tool will empower us as citizens to enhance transparency and civic engagement in our beloved country by:  
+- Tracking manifesto pledges against actual delivery
+- Monitor legislative performance
 - Centralizing hard-to-find government reports  
-- Providing **AI-verified summaries** of political performance  
+- Educate citizens on their rights and oversight mechanisms
 
-## 🤖 Why DeepSeek-R1?  
+This is more than a web app - it's a civic duty. In an era of digital transformation, we're harnessing technology to strengthen democracy from the ground up.
+
+## Key Features
+[-] AI-Powered Political Q&A: Get factual answers about government projects and officials
+[-] Promise Tracker: Follow through on campaign commitments
+[-] Corruption Reporting: Guided process for reporting misconduct
+[-] Legislative Watch: Monitor MP attendance and voting records
+
+## Important Usage Notes
+API Limitations:
+        We currently use DeepSeek's free AI model via OpenRouter
+        Rate limiting (~100 requests/hour) may cause delays during peak times
+        Token limits may temporarily restrict service if usage spikes
+
+    Your Patience Powers Democracy:
+        If you encounter delays, please wait 1-2 minutes before retrying
+        Consider drafting concise questions to conserve resources
+
+## Why DeepSeek-R1?  
 We chose this model because:  
 
 | Feature               | Benefit for Kenya                                  |
@@ -18,28 +37,91 @@ We chose this model because:
 | **Free via OpenRouter** | No API costs for civic tech                       |
 | **163K context**      | Analyzes long PDFs (manifestos, audit reports)    |
 | **Open-source**       | Avoids proprietary lock-in                        |
-| **Kiswahili support** | Handles local languages natively                  |
 
-*Alternatives considered: GPT-4 (costly), Claude (limited Kenya knowledge), local models (low accuracy).*
 
 ## 🛠️ Tech Stack  
 **Backend**  
-- Python + FastAPI  
+- Python + FastAPI 
 - DeepSeek-R1 via OpenRouter  
-- SQLite (query history cache)  
+- Mysql Database
 
 **Frontend**  
 - Next.js 14 (App Router)  
 - TailwindCSS  
 - ShadCN UI  
 
-## 🚀 Setup Guide  
+## Setup Guide  
 
-### 1. Backend Setup  
-```bash
+### Prerequisites
+
+    Node.js v16+ (Frontend)
+
+    Python 3.10+ (Backend)
+
+    MySQL 8.0+
+
+    OpenAI API key (from OpenRouter)
+
+Installation
+
+    Clone the Repository
+
+
+```
+git clone https://github.com/HassanMunene/mheshimiwa-watch.git
+cd mheshimiwa-watch
+```
+
+### Backend Setup
+```
 cd backend
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate (Windows)
-
+# venv\Scripts\activate  # Windows
 pip install -r requirements.txt
+```
+
+Database Configuration
+```
+mysql -u root -p
+CREATE DATABASE mheshimiwa_watch;
+CREATE USER 'mhesh_user'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON mheshimiwa_watch.* TO 'mhesh_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Environment Variables
+Create .env in /backend:
+env
+
+DB_HOST=localhost
+DB_USER=mhesh_user
+DB_PASSWORD=your_password
+DB_NAME=mheshimiwa_watch
+OPENROUTER_API_KEY=your_openrouter_key
+
+### Frontend Setup
+```
+
+    cd ../frontend
+    npm install
+```
+
+### Running the Application
+
+    Start Backend
+```
+
+cd backend
+uvicorn main:app --reload
+```
+
+Start Frontend
+```
+
+cd ../frontend
+npm run dev
+```
+
+Access the App
+Open http://localhost:3000 in your browser
