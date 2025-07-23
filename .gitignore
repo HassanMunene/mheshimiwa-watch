@@ -1,0 +1,13 @@
+# Backend
+backend/.env
+backend/venv/
+backend/__pycache__/
+*.pyc
+
+# Frontend
+frontend/.next/
+frontend/node_modules/
+frontend/.env*
+
+# General
+.DS_Store  # Mac metadata
