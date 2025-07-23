@@ -1,7 +1,8 @@
 # Mheshimiwa Watch: Political Accountability Tracker 🇰🇪  
 **AI-Powered Political Accountability Tracker for Kenya**  
+![Mheshimiwa Screenshot](https://github.com/user-attachments/assets/d7217a9b-a1d4-4b78-b7bf-c1a92bbac715)
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://your-vercel-link.vercel.app)  
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://mheshimiwa-watch.vercel.app/)  
 [![Powered by DeepSeek-R1](https://img.shields.io/badge/Powered%20by-DeepSeek--R1-6e48aa?logo=openai)](https://openrouter.ai/models/deepseek/deepseek-r1:free)
 
 ## Why This Project?
