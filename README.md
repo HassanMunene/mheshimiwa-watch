@@ -42,9 +42,11 @@ We chose this model because:
 
 ## 🛠️ Tech Stack  
 **Backend**  
-- Python + FastAPI 
+- Python + FastAPI  
 - DeepSeek-R1 via OpenRouter  
-- Mysql Database
+- MySQL Database (hosted on [Aiven Free MySQL](https://aiven.io/free-mysql-database))  
+
+> 💡 **Note:** This project uses a cloud-hosted MySQL database on [Aiven](https://aiven.io/free-mysql-database), one of the few platforms currently offering free, reliable MySQL hosting — since most cloud providers have discontinued their free MySQL tiers.
 
 **Frontend**  
 - Next.js 14 (App Router)  
