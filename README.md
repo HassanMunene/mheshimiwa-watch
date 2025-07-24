@@ -39,9 +39,31 @@ We chose this model because:
 | **163K context**      | Analyzes long PDFs (manifestos, audit reports)    |
 | **Open-source**       | Avoids proprietary lock-in                        |
 
+### 🔑 API Key Requirement
 
+This project uses the DeepSeek-R1 large language model via OpenRouter.
+You’ll need to obtain a free API key from OpenRouter to enable AI functionality.
+📍 Steps to Get Your Key:
+
+    Visit https://openrouter.ai
+
+    Sign in with GitHub or Google
+
+    Go to https://openrouter.ai/keys
+
+    Click “Create Key”
+
+    Copy the generated key
+
+### 🧪 Where to Put the Key
+```
+Backend (/backend/.env):
+
+OPENROUTER_API_KEY=your_openrouter_key
+```
 ## 🛠️ Tech Stack  
 **Backend**  
+**Backend hosted on [Render](https://render.com)** 
 - Python + FastAPI  
 - DeepSeek-R1 via OpenRouter  
 - MySQL Database (hosted on [Aiven Free MySQL](https://aiven.io/free-mysql-database))  
