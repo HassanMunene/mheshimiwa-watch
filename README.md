@@ -108,6 +108,11 @@ OPENROUTER_API_KEY=your_openrouter_key
 
     cd ../frontend
     npm install
+
+    Environment Variables for Frontend
+
+    Create a .env file in the /frontend directory:
+    NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 
 ### Running the Application
